@@ -30,6 +30,7 @@ def main(
         output_folder: Path,
         n_epochs: int
 ):
+    print(f'Input file list:{input_files}')
     labels_files = [file_to_label_file(input_file) for input_file in input_files]
 
     assert all(input_file.name.endswith("-epo.fif") for input_file in input_files)

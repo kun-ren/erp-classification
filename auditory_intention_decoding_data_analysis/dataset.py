@@ -21,7 +21,7 @@ def get_trigger_from_annotation(annotation: Dict[str, Any]) -> Optional[Tuple[in
     if match is None:
         return None
 
-    trigger_num = stimulus[match.end():]
+    trigger_num = stimulus[match.end():] # extract the number behind Stimulus/S
 
     try:
         return int(trigger_num), float(annotation['onset'])
@@ -80,10 +80,9 @@ def main(
     dig_montage = mne.channels.make_standard_montage("standard_1005")
     _ = raw.set_montage(dig_montage)
 
-    logger.info(f"Loading data: {input_file}")
-    raw.load_data()
-
     if re_reference:
+        logger.info(f"Loading data: {input_file}")
+        raw.load_data()
         logger.info("Applying average reference to data")
         raw.set_eeg_reference("average")
 

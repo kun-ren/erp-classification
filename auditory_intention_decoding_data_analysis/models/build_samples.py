@@ -20,6 +20,8 @@ class Tagger:
     target: int
 
 
+#the tpye stimulus is collectively defined by your the modification method of audio and the type of the event
+
 TRIGGERS = {
     "RAW":      Tagger(option=50, target=70),
     "AM":       Tagger(option=51, target=71),
@@ -52,6 +54,8 @@ def main(
 
     logger.info("Extracting events")
     events, event_id = mne.events_from_annotations(raw)
+    # mne Epochs cut raw eeg data into smaller pieces according to events,
+    # with a span from event_time - tmin to event_time + tmax.
     epochs = mne.Epochs(raw, events, event_id, tmin=tmin, tmax=tmax, baseline=(None, 0), event_repeated="drop")
 
     epochs_options: Dict[str, mne.Epochs] = {trigger: epochs[f"Stimulus/S {TRIGGERS[trigger].option}"] for trigger in

@@ -109,6 +109,7 @@ def get_trigger_name(trigger: int) -> str:
     if Triggers.OPTION_START_OFFSET <= trigger < Triggers.OPTION_END:
         offset = trigger - Triggers.OPTION_START_OFFSET
 
+        # NEW PROMPT_2
         return TRIGGER_NAMES[Triggers.OPTION_START_OFFSET] + "_" + TRIGGER_OFFSETS[offset].value
 
     elif Triggers.TARGET_START_OFFSET <= trigger < Triggers.TARGET_END:

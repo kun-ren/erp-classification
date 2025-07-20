@@ -65,7 +65,7 @@ SAMPLES_TARGETS := $(PROCESSED_FILES:data/processed/%.fif=data/interim/samples/%
 build-samples: $(SAMPLES_TARGETS)
 data/interim/samples/%-epo.fif: data/processed/%.fif
 	mkdir -p $$(dirname $@)
-	$(PYTHON_INTERPRETER) $(SRC)/models/build_samples.py $^ $@ --sfreq 128 --tmin '-0.5' --tmax 3
+	$(PYTHON_INTERPRETER) $(SRC)/models/build_samples.py $^ $@ --sfreq 128 --tmin -0.2 --tmax 1
 
 #--------------------------------------------------------------------------------
 
@@ -76,7 +76,7 @@ SAMPLES_TF_TARGETS := $(PROCESSED_FILES:data/processed/%.fif=data/interim/sample
 build-samples-tf: $(SAMPLES_TF_TARGETS)
 data/interim/samples-tf/%-epo.fif: data/processed/%.fif
 	mkdir -p $$(dirname $@)
-	$(PYTHON_INTERPRETER) $(SRC)/models/build_samples.py $^ $@ --tmin '-1.5' --tmax 5
+	$(PYTHON_INTERPRETER) $(SRC)/models/build_samples.py $^ $@ --tmin -0.2 --tmax 1
 
 #--------------------------------------------------------------------------------
 
@@ -100,6 +100,53 @@ $(EEGNET_MICHAL): data/interim/samples/sub-michal_ses-01-epo.fif data/interim/sa
 	mkdir -p $@
 	$(PYTHON_INTERPRETER) $(SRC)/models/eegnet.py $^ $@ 500
 	touch $@
+
+
+#--------------------------------------------------------------------------------
+
+
+RIEMANN_TARGETS := $(SAMPLES_TARGETS:data/interim/samples/%-epo.fif=reports/riemann/%)
+RIEMANN_ALL := reports/riemann/all
+RIEMANN_MICHAL := reports/riemann/all-michal
+
+## Train Riemann
+train-riemann: $(RIEMANN_TARGETS) $(RIEMANN_ALL) $(RIEMANN_MICHAL)
+
+reports/riemann/%: data/interim/samples/%-epo.fif
+	mkdir -p $@
+	$(PYTHON_INTERPRETER) $(SRC)/models/erp_classification.py $^ $@
+	touch $@
+
+$(RIEMANN_ALL): $(SAMPLES_TARGETS)
+	mkdir -p $@
+	$(PYTHON_INTERPRETER) $(SRC)/models/erp_classification.py $^ $@
+	touch $@
+
+$(RIEMANN_MICHAL): data/interim/samples/sub-michal_ses-01-epo.fif data/interim/samples/sub-michal_ses-02-epo.fif data/interim/samples/sub-michal_ses-03-epo.fif
+	mkdir -p $@
+	$(PYTHON_INTERPRETER) $(SRC)/models/erp_classification.py $^ $@
+	touch $@
+
+## Train Riemann Grid
+train-riemann-grid: $(RIEMANN_TARGETS) $(RIEMANN_ALL) $(RIEMANN_MICHAL)
+
+reports/riemann/%: data/interim/samples/%-epo.fif
+	mkdir -p $@
+	$(PYTHON_INTERPRETER) $(SRC)/models/erp_classification_grid_search.py $^ $@
+	touch $@
+
+$(RIEMANN_ALL): $(SAMPLES_TARGETS)
+	mkdir -p $@
+	$(PYTHON_INTERPRETER) $(SRC)/models/erp_classification_grid_search.py $^ $@
+	touch $@
+
+$(RIEMANN_MICHAL): data/interim/samples/sub-michal_ses-01-epo.fif data/interim/samples/sub-michal_ses-02-epo.fif data/interim/samples/sub-michal_ses-03-epo.fif
+	mkdir -p $@
+	$(PYTHON_INTERPRETER) $(SRC)/models/erp_classification_grid_search.py $^ $@
+	touch $@
+
+
+
 #--------------------------------------------------------------------------------
 
 PERMUTATION_ANALYSIS_TARGETS := $(EEGNET_TARGETS:reports/eegnet/%=reports/permutation-analysis/%.log)
