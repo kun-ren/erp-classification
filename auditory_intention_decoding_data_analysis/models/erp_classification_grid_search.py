@@ -60,7 +60,6 @@ class SpatialFilterWrapper(BaseEstimator):
     def transform(self, X):
         return self.model.transform(X)
 
-# 类似包装协方差
 class CovarianceWrapper(BaseEstimator):
     def __init__(self, cov_cls=Covariances, estimator='lwf', classes=None):
         self.cov_cls = cov_cls
@@ -85,7 +84,6 @@ class CovarianceWrapper(BaseEstimator):
     def transform(self, X):
         return self.model.transform(X)
 
-# 分类器包装
 class ClassifierWrapper(BaseEstimator):
     def __init__(self, metric='riemann', ts_clf=LinearDiscriminantAnalysis(), svm_kernel='riemann', svm_c=1, clf_cls=MDM, ):
         self.clf_cls = clf_cls
@@ -140,22 +138,36 @@ def main(
 
     data = epochs_combined.get_data()  # shape = (n_trials, n_channels, n_times)
 
+    # param_grid = {
+    #     # 'spatialfilter__metric': ['riemann', 'logeuclid', 'kullback_sym', 'wasserstein'],
+    #     # 'spatialfilter__filter_cls': [Xdawn, CSP, SPoC, BilinearFilter],
+    #     # 'spatialfilter__nfilter': [1, 2, 3, 4],
+    #     # 'spatialfilter__estimator': ['oas', 'lwf', 'scm'],
+    #     'cov__cov_cls': [Covariances, ERPCovariances],
+    #     'cov__estimator': ['oas', 'lwf', 'scm'],
+    #     'clf__clf_cls': [MDM, FgMDM, TSclassifier, SVC],
+    #     'clf__metric': ['riemann', 'logeuclid', 'kullback_sym', 'wasserstein'],
+    #     'clf__ts_clf': [LinearDiscriminantAnalysis(), LogisticRegression(), RidgeClassifier()],
+    #     'clf__svm_kernel': ['riemann', 'logeuclid'],
+    #     'clf__svm_c': [0.01, 0.1, 1, 10, 100]
+    # }
+
     param_grid = {
-        'spatialfilter__metric': ['riemann', 'logeuclid', 'kullback_sym', 'wasserstein'],
-        'spatialfilter__filter_cls': [Xdawn, CSP, SPoC, BilinearFilter],
-        'spatialfilter__nfilter': [1, 2, 3, 4],
-        'spatialfilter__estimator': ['oas', 'lwf', 'scm'],
+        # 'spatialfilter__metric': ['riemann', 'logeuclid', 'kullback_sym', 'wasserstein'],
+        # 'spatialfilter__filter_cls': [Xdawn, CSP, SPoC, BilinearFilter],
+        # 'spatialfilter__nfilter': [1, 2, 3, 4],
+        # 'spatialfilter__estimator': ['oas', 'lwf', 'scm'],
         'cov__cov_cls': [Covariances, ERPCovariances],
-        'cov__estimator': ['oas', 'lwf', 'scm'],
-        'clf__clf_cls': [MDM, FgMDM, TSclassifier, SVC],
-        'clf__metric': ['riemann', 'logeuclid', 'kullback_sym', 'wasserstein'],
-        'clf__ts_clf': [LinearDiscriminantAnalysis(), LogisticRegression(), RidgeClassifier()],
-        'clf__svm_kernel': ['riemann', 'logeuclid'],
-        'clf__svm_c': [0.01, 0.1, 1, 10, 100]
+        'cov__estimator': ['lwf'],
+        'clf__clf_cls': [MDM, TSclassifier],
+        'clf__metric': ['riemann',],
+        'clf__ts_clf': [LinearDiscriminantAnalysis(), LogisticRegression()],
+        'clf__svm_kernel': ['riemann',],
+        'clf__svm_c': [0.1, 1, 10,]
     }
 
     pipe = Pipeline([
-        ('spatialfilter', SpatialFilterWrapper(classes=[0, 1], estimator='lwf')),
+        # ('spatialfilter', SpatialFilterWrapper(classes=[0, 1], estimator='lwf')),
         ('cov', CovarianceWrapper()),
         ('clf', ClassifierWrapper())
     ])
