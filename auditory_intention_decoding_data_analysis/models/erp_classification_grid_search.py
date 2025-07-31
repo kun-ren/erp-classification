@@ -174,13 +174,14 @@ def main(
 
     sss = StratifiedShuffleSplit(n_splits=10, test_size=0.2, random_state=42)
 
-    gs = GridSearchCV(pipe, param_grid, cv=sss, scoring='accuracy', n_jobs=-1)
+    gs_riemann_space = GridSearchCV(pipe, param_grid, cv=sss, scoring='accuracy', n_jobs=2)
+    #gs_tagent_space = GridSearchCV(estimator=)
 
-    gs.fit(data, labels)
+    gs_riemann_space.fit(data, labels)
 
-    print("Best accuracy:", gs.best_score_)
+    print("Best accuracy:", gs_riemann_space.best_score_)
     print("Best parameters:")
-    for k, v in gs.best_params_.items():
+    for k, v in gs_riemann_space.best_params_.items():
         print(f"  {k}: {v}")
 
 
