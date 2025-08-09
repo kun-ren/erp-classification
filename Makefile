@@ -128,22 +128,22 @@ $(RIEMANN_MICHAL): data/interim/samples/sub-michal_ses-01-epo.fif data/interim/s
 	touch $@
 
 ## Train Riemann Grid
-train-riemann-grid: $(RIEMANN_TARGETS) $(RIEMANN_ALL) $(RIEMANN_MICHAL)
-
-reports/riemann/%: data/interim/samples/%-epo.fif
-	mkdir -p $@
-	$(PYTHON_INTERPRETER) $(SRC)/models/erp_classification_grid_search.py $^ $@
-	touch $@
-
-$(RIEMANN_ALL): $(SAMPLES_TARGETS)
-	mkdir -p $@
-	$(PYTHON_INTERPRETER) $(SRC)/models/erp_classification_grid_search.py $^ $@
-	touch $@
-
-$(RIEMANN_MICHAL): data/interim/samples/sub-michal_ses-01-epo.fif data/interim/samples/sub-michal_ses-02-epo.fif data/interim/samples/sub-michal_ses-03-epo.fif
-	mkdir -p $@
-	$(PYTHON_INTERPRETER) $(SRC)/models/erp_classification_grid_search.py $^ $@
-	touch $@
+#train-riemann-grid: $(RIEMANN_TARGETS) $(RIEMANN_ALL) $(RIEMANN_MICHAL)
+#
+#reports/riemann/%: data/interim/samples/%-epo.fif
+#	mkdir -p $@
+#	$(PYTHON_INTERPRETER) $(SRC)/models/erp_classification_grid_search.py $^ $@
+#	touch $@
+#
+#$(RIEMANN_ALL): $(SAMPLES_TARGETS)
+#	mkdir -p $@
+#	$(PYTHON_INTERPRETER) $(SRC)/models/erp_classification_grid_search.py $^ $@
+#	touch $@
+#
+#$(RIEMANN_MICHAL): data/interim/samples/sub-michal_ses-01-epo.fif data/interim/samples/sub-michal_ses-02-epo.fif data/interim/samples/sub-michal_ses-03-epo.fif
+#	mkdir -p $@
+#	$(PYTHON_INTERPRETER) $(SRC)/models/erp_classification_grid_search.py $^ $@
+#	touch $@
 
 
 

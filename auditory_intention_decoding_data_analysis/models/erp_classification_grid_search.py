@@ -26,11 +26,15 @@ from auditory_intention_decoding_data_analysis.models.utils import file_to_label
 
 mne.use_log_level("warning")
 app = typer.Typer()
+
+
 def make_filter(filter_cls, nfilter=None):
     if nfilter is not None:
         return filter_cls(nfilter=nfilter)
     else:
         return filter_cls()
+
+
 class SpatialFilterWrapper(BaseEstimator):
     def __init__(self, metric='riemann', filter_cls=Xdawn, nfilter=2, classes=None, estimator='lwf'):
         self.filter_cls = filter_cls
@@ -60,6 +64,7 @@ class SpatialFilterWrapper(BaseEstimator):
     def transform(self, X):
         return self.model.transform(X)
 
+
 class CovarianceWrapper(BaseEstimator):
     def __init__(self, cov_cls=Covariances, estimator='lwf', classes=None):
         self.cov_cls = cov_cls
@@ -84,8 +89,10 @@ class CovarianceWrapper(BaseEstimator):
     def transform(self, X):
         return self.model.transform(X)
 
+
 class ClassifierWrapper(BaseEstimator):
-    def __init__(self, metric='riemann', ts_clf=LinearDiscriminantAnalysis(), svm_kernel='riemann', svm_c=1, clf_cls=MDM, ):
+    def __init__(self, metric='riemann', ts_clf=LinearDiscriminantAnalysis(), svm_kernel='riemann', svm_c=1,
+                 clf_cls=MDM, sample_weight=None):
         self.clf_cls = clf_cls
         self.model = None
         self.metric = metric
@@ -115,6 +122,7 @@ class ClassifierWrapper(BaseEstimator):
 
     def score(self, X, y):
         return self.model.score(X, y)
+
 
 @app.command()
 def main(
@@ -152,18 +160,21 @@ def main(
     #     'clf__svm_c': [0.01, 0.1, 1, 10, 100]
     # }
 
-    param_grid = {
-        # 'spatialfilter__metric': ['riemann', 'logeuclid', 'kullback_sym', 'wasserstein'],
-        # 'spatialfilter__filter_cls': [Xdawn, CSP, SPoC, BilinearFilter],
-        # 'spatialfilter__nfilter': [1, 2, 3, 4],
-        # 'spatialfilter__estimator': ['oas', 'lwf', 'scm'],
+    param_grid_riemann_space = {
+        'cov__cov_classes': [Covariances, ERPCovariances],
+        'cov__estimator': ['lwf'],
+        'clf__classifier': [MDM, FgMDM],
+        'clf__metric': ['riemann', ],
+    }
+
+    param_grid_tagent_space = {
         'cov__cov_cls': [Covariances, ERPCovariances],
         'cov__estimator': ['lwf'],
-        'clf__clf_cls': [MDM, TSclassifier],
-        'clf__metric': ['riemann',],
+        'clf__clf_cls': [TSclassifier],
+        'clf__metric': ['riemann', ],
         'clf__ts_clf': [LinearDiscriminantAnalysis(), LogisticRegression()],
-        'clf__svm_kernel': ['riemann',],
-        'clf__svm_c': [0.1, 1, 10,]
+        'clf__svm_kernel': ['riemann', ],
+        'clf__svm_c': [0.01, 0.1, ]
     }
 
     pipe = Pipeline([
@@ -175,7 +186,7 @@ def main(
     sss = StratifiedShuffleSplit(n_splits=10, test_size=0.2, random_state=42)
 
     gs_riemann_space = GridSearchCV(pipe, param_grid, cv=sss, scoring='accuracy', n_jobs=2)
-    #gs_tagent_space = GridSearchCV(estimator=)
+    # gs_tagent_space = GridSearchCV(estimator=)
 
     gs_riemann_space.fit(data, labels)
 
