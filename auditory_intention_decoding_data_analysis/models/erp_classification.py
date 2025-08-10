@@ -6,10 +6,6 @@ import mne
 import numpy as np
 import pandas as pd
 import typer
-from mne.decoding import CSP
-from pyriemann.tangentspace import TangentSpace
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.pipeline import make_pipeline
@@ -17,14 +13,15 @@ from sklearn.metrics import accuracy_score, f1_score
 
 from pyriemann.estimation import ERPCovariances, XdawnCovariances
 from pyriemann.classification import MDM, FgMDM, TSclassifier
-from sklearn.preprocessing import StandardScaler
-from sklearn.svm import SVC
 
 from auditory_intention_decoding_data_analysis.models.utils import file_to_label_file, read_labels_file, Prediction
 
 mne.use_log_level("warning")
 app = typer.Typer()
-
+import os
+os.environ["JOBLIB_TEMP_FOLDER"] = "/tmp"
+os.environ["OMP_NUM_THREADS"] = "4"
+os.environ["MKL_NUM_THREADS"] = "4"
 
 def shuffle_pipeline(pipeline, data, labels, taggers):
     sss = StratifiedShuffleSplit(n_splits=10, test_size=0.2, random_state=42)
@@ -101,24 +98,24 @@ def main(
 
     # 1. test the impact of filters.
     clf_riemann_space_with_filter = make_pipeline(
-        XdawnCovariances(classes=[0, 1], estimator='lwf'),
-        MDM(metric='riemann'),
+        XdawnCovariances(classes=[0, 1], estimator='lwf', n_jobs=4),
+        MDM(metric='riemann', n_jobs=4),
     )
     clf_riemann_space_without_filter = make_pipeline(
-        ERPCovariances(classes=[0, 1], estimator='lwf'),
-        MDM(metric='riemann'),
+        ERPCovariances(classes=[0, 1], estimator='lwf', n_jobs=4),
+        MDM(metric='riemann', n_jobs=4),
     )
 
     # 2. tagentSpace classification
 
     clf_tagent_space = make_pipeline(
-        ERPCovariances(classes=[0, 1], estimator='lwf'),
-        TSclassifier(metric='riemann', tsupdate=True, clf=LogisticRegression())
+        ERPCovariances(classes=[0, 1], estimator='lwf', n_jobs=4),
+        TSclassifier(metric='riemann', tsupdate=True, clf=LogisticRegression(n_jobs=4),)
     )
 
     clf_reduce_dimension = make_pipeline(
-        ERPCovariances(classes=[0, 1], estimator='lwf'),
-        FgMDM(metric='riemann', tsupdate=True, ) # FgMDM = FGDA + MDM
+        ERPCovariances(classes=[0, 1], estimator='lwf', n_jobs=4),
+        FgMDM(metric='riemann', tsupdate=True, n_jobs=4) # FgMDM = FGDA + MDM
     )
 
 
