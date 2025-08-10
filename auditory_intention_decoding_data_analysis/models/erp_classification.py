@@ -98,24 +98,24 @@ def main(
 
     # 1. test the impact of filters.
     clf_riemann_space_with_filter = make_pipeline(
-        XdawnCovariances(classes=[0, 1], estimator='lwf', n_jobs=4),
+        XdawnCovariances(classes=[0, 1], estimator='lwf',),
         MDM(metric='riemann', n_jobs=4),
     )
     clf_riemann_space_without_filter = make_pipeline(
-        ERPCovariances(classes=[0, 1], estimator='lwf', n_jobs=4),
+        ERPCovariances(classes=[0, 1], estimator='lwf', ),
         MDM(metric='riemann', n_jobs=4),
     )
 
     # 2. tagentSpace classification
 
     clf_tagent_space = make_pipeline(
-        ERPCovariances(classes=[0, 1], estimator='lwf', n_jobs=4),
+        ERPCovariances(classes=[0, 1], estimator='lwf', ),
         TSclassifier(metric='riemann', tsupdate=True, clf=LogisticRegression(n_jobs=4),)
     )
 
     clf_reduce_dimension = make_pipeline(
-        ERPCovariances(classes=[0, 1], estimator='lwf', n_jobs=4),
-        FgMDM(metric='riemann', tsupdate=True, n_jobs=4) # FgMDM = FGDA + MDM
+        ERPCovariances(classes=[0, 1], estimator='lwf'),
+        FgMDM(metric='riemann', tsupdate=True, n_jobs=4)   # FgMDM = FGDA + MDM
     )
 
 
