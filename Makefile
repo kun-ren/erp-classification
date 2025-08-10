@@ -147,13 +147,13 @@ $(RIEMANN_MICHAL): data/interim/samples/sub-michal_ses-01-epo.fif data/interim/s
 
 
 
-## Train Riemann Grid Michal
-train-riemann-grid-michal: $(RIEMANN_MICHAL)
-
-$(RIEMANN_MICHAL): data/interim/samples/sub-michal_ses-01-epo.fif data/interim/samples/sub-michal_ses-02-epo.fif data/interim/samples/sub-michal_ses-03-epo.fif
-	mkdir -p $@
-	$(PYTHON_INTERPRETER) $(SRC)/models/erp_classification_grid_search.py $^ $@
-	touch $@
+### Train Riemann Grid Michal
+#train-riemann-grid-michal: $(RIEMANN_MICHAL)
+#
+#$(RIEMANN_MICHAL): data/interim/samples/sub-michal_ses-01-epo.fif data/interim/samples/sub-michal_ses-02-epo.fif data/interim/samples/sub-michal_ses-03-epo.fif
+#	mkdir -p $@
+#	$(PYTHON_INTERPRETER) $(SRC)/models/erp_classification_grid_search.py $^ $@
+#	touch $@
 
 
 
