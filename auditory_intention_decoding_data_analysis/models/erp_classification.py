@@ -6,6 +6,7 @@ import mne
 import numpy as np
 import pandas as pd
 import typer
+from pyriemann.tangentspace import TangentSpace
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.pipeline import make_pipeline
@@ -13,13 +14,13 @@ from sklearn.metrics import accuracy_score, f1_score
 
 from pyriemann.estimation import ERPCovariances, XdawnCovariances
 from pyriemann.classification import MDM, FgMDM, TSclassifier
+from sklearn.preprocessing import StandardScaler
 
 from auditory_intention_decoding_data_analysis.models.utils import file_to_label_file, read_labels_file, Prediction
 
 mne.use_log_level("warning")
 app = typer.Typer()
 import os
-os.environ["JOBLIB_TEMP_FOLDER"] = "/tmp"
 os.environ["OMP_NUM_THREADS"] = "4"
 os.environ["MKL_NUM_THREADS"] = "4"
 
@@ -110,7 +111,9 @@ def main(
 
     clf_tagent_space = make_pipeline(
         ERPCovariances(classes=[0, 1], estimator='lwf', ),
-        TSclassifier(metric='riemann', tsupdate=True, clf=LogisticRegression(n_jobs=4),)
+        TangentSpace(metric='riemann'),
+        StandardScaler(),  # to accelerate convergence
+        LogisticRegression(max_iter=500, solver='lbfgs', n_jobs=4)
     )
 
     clf_reduce_dimension = make_pipeline(
